@@ -1,13 +1,6 @@
 #!/usr/bin/php
 <?php
 
-#define('_ECRIRE_INC_VERSION', true);
-#include_once('../config/connect.php');
-
-#function spip_connect_db($host, $port, $user, $pass, $base, $type, $prefix, $ldap, $charset){
-#	$GLOBALS['link'] = mysqli_connect($host, $user, $pass, $base, intval($port));
-#}
-
 if (isset($argv[1])) {
 	$t = strtotime($argv[1]);
 	if (!$t) {

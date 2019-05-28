@@ -1,13 +1,6 @@
 #!/usr/bin/php
 <?php
 
-#define('_ECRIRE_INC_VERSION', true);
-#include_once('../config/connect.php');
-
-#function spip_connect_db($host, $port, $user, $pass, $base, $type, $prefix, $ldap, $charset){
-#	$GLOBALS['link'] = mysqli_connect($host, $user, $pass, $base, intval($port));
-#}
-
 $first_day_of_month = date('Y-m-01 00:00:00');
 $comptes = [];
 
