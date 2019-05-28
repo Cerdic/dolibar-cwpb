@@ -125,7 +125,8 @@ if ($result){
 			echo $csv;
 		}
 		else {
-			echo "\n";
+			$csv = exporter_csv('', [], ',', $header);
+			echo $csv;
 		}
 	}
 }
