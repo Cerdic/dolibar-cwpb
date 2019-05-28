@@ -78,6 +78,7 @@ if ($email_dest) {
 
 		$mailer = new PHPMailer();
 		$mailer->From = 'noreply@coworking-pb.com';
+		$mailer->FromName = 'NoNo le petit robot';
 		$mailer->CharSet = "utf-8";
 		$mailer->Mailer = 'mail';
 		$mailer->Subject = $sujet;
