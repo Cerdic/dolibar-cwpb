@@ -84,7 +84,9 @@ if ($email_dest) {
 		$mailer->Subject = $sujet;
 		$mailer->isHTML(false);
 		$mailer->Body = $texte;
-		$mailer->addAddress($destinataire);
+		foreach (explode(',', $destinataire) as $d) {
+			$mailer->addAddress(trim($d));
+		}
 
 		foreach ($pieces_jointes as $piece) {
 			$mailer->addAttachment(
