@@ -60,7 +60,7 @@ $date_endyear = date('Y', $time_end);
  */
 global $mysoc;
 
-require __DIR__ . '/doli_boot.php';
+require __DIR__ . '/../doli_boot.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/report.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/compta/facture/class/facture.class.php';

@@ -29,7 +29,7 @@ $exports = [];
 
 // creer le repertoire exports
 $dir = __DIR__ ;
-$dir_export = __DIR__ . '/csv';
+$dir_export = __DIR__ . '/exports/csv';
 
 if (!is_dir($dir_export)) {
 	mkdir($dir_export);
@@ -43,7 +43,7 @@ $file_export = "$dir_export/$month_export-ventes.csv";
 $titre_export = "Ventes $month_export";
 $exports[$file_export] = $titre_export;
 echo "$titre_export -> $file_export\n";
-passthru("php $dir/ventes.php $month_export > $file_export");
+passthru("php $dir/exports/ventes.php $month_export > $file_export");
 
 $sql = "SELECT ba.ref as ba_ref, ba.label as ba_label FROM lx_bank_account as ba WHERE ba.clos = 0 AND ba.entity IN (1) AND ba.ref !='CS' ORDER BY ba.rowid";
 $result = $db->query($sql);
@@ -55,7 +55,7 @@ if ($result){
 		$titre_export = "Banque $nom [{$banque}] $month_export";
 		$exports[$file_export] = $titre_export;
 		echo "$titre_export -> $file_export\n";
-		passthru("php $dir/banques.php $month_export $banque > $file_export");
+		passthru("php $dir/exports/banques.php $month_export $banque > $file_export");
 	}
 }
 

@@ -32,7 +32,7 @@ $month_export = date('Ym', strtotime($first_day_of_month)-7200);
  */
 global $mysoc;
 
-require __DIR__ . '/doli_boot.php';
+require __DIR__ . '/../doli_boot.php';
 
 
 $sql = "SELECT DISTINCT b.rowid as b_rowid, ba.ref as ba_ref, ba.label as ba_label, b.dateo as b_dateo, b.label as b_label, b.num_chq as b_num_chq, b.amount as b_amount, s.nom as s_nom 
