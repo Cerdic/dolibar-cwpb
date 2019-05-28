@@ -130,6 +130,7 @@ if ($result){
 $i = 0;
 $nb_success = 0;
 $nb_echec = 0;
+$nb_ignore = 0;
 foreach ($refacturer as $ref=>$facture) {
 	$i++;
 	if (($deja_ref = cherche_deja_brouillon($facture['socid'])) !== false) {
@@ -143,6 +144,7 @@ foreach ($refacturer as $ref=>$facture) {
 
 	if ($deja_ref !== false) {
 		echo "\tDEJA preparee en brouillon ce mois\n";
+		$nb_ignore++;
 	}
 	else {
 
@@ -161,6 +163,9 @@ foreach ($refacturer as $ref=>$facture) {
 echo "$nb_success factures générées";
 if ($nb_echec) {
 	echo " / $nb_echec FAIL";
+}
+if ($nb_ignore) {
+	echo " / $nb_ignore IGNORE";
 }
 echo "\n";
 
