@@ -34,9 +34,19 @@ global $mysoc;
 
 require __DIR__ . '/../doli_boot.php';
 
+/*
+SELECT DISTINCT b.rowid as b_rowid, ba.ref as ba_ref, ba.label as ba_label, b.dateo as b_dateo, b.label as b_label, b.num_chq as b_num_chq, b.amount as b_amount, b.emetteur as b_emetteur, s.code_compta as s_code_compta, s.nom as s_nom, bu.url_id as url_id_company, concat(a.firstname, ' ', a.lastname) as a_nom, sa.code_compta as sa_code_compta, sa.nom as sa_nom
+FROM (lx_bank_account as ba, lx_bank as b)
+LEFT JOIN lx_bank_url as bu ON (bu.fk_bank = b.rowid AND bu.type = 'company') LEFT JOIN lx_societe as s ON bu.url_id = s.rowid
+LEFT JOIN lx_bank_url as bua ON (bua.fk_bank = b.rowid AND bua.type = 'member') LEFT JOIN lx_adherent as a ON bua.url_id = a.rowid LEFT JOIN lx_societe as sa ON a.fk_soc = sa.rowid
+WHERE ba.rowid = b.fk_account AND ba.entity IN (1) and date_format(b.dateo,'%Y%m') = '201901' ORDER BY b.dateo, b.num_releve */
 
-$sql = "SELECT DISTINCT b.rowid as b_rowid, ba.ref as ba_ref, ba.label as ba_label, b.dateo as b_dateo, b.label as b_label, b.num_chq as b_num_chq, b.amount as b_amount, s.nom as s_nom 
-FROM (lx_bank_account as ba, lx_bank as b) LEFT JOIN lx_bank_url as bu ON (bu.fk_bank = b.rowid AND bu.type = 'company') LEFT JOIN lx_societe as s ON bu.url_id = s.rowid 
+$sql = "SELECT DISTINCT b.rowid as b_rowid, ba.ref as ba_ref, ba.label as ba_label, b.dateo as b_dateo, b.label as b_label, b.num_chq as b_num_chq, b.amount as b_amount, b.emetteur as b_emetteur, 
+s.code_compta as s_code_compta, s.nom as s_nom, 
+concat(a.firstname, ' ', a.lastname) as a_nom, sa.code_compta as sa_code_compta, sa.nom as sa_nom
+FROM (lx_bank_account as ba, lx_bank as b) 
+LEFT JOIN lx_bank_url as bu ON (bu.fk_bank = b.rowid AND bu.type = 'company') LEFT JOIN lx_societe as s ON bu.url_id = s.rowid 
+LEFT JOIN lx_bank_url as bua ON (bua.fk_bank = b.rowid AND bua.type = 'member') LEFT JOIN lx_adherent as a ON bua.url_id = a.rowid LEFT JOIN lx_societe as sa ON a.fk_soc = sa.rowid 
 WHERE ba.rowid = b.fk_account AND ba.entity IN (1) and date_format(b.dateo,'%Y%m') = '$month_export' ORDER BY b.dateo, b.num_releve
 ";
 
@@ -45,7 +55,7 @@ if (in_array($db->type, array('mysql', 'mysqli'))){
 	$db->query('SET SQL_BIG_SELECTS=1');
 }
 
-$header = ["Date", "Libelle", "Debit", "Credit", "No_Piece"];
+$header = ["Date", "Libelle", "Debit", "Credit", "Code_compta", "No_Piece"];
 $releves = [];
 
 $result = $db->query($sql);
@@ -62,10 +72,16 @@ if ($result){
 		}
 		$date = date('d/m/Y',strtotime($obj->b_dateo));
 		$piece = "";
+		$code_compta = "";
 
 		switch($obj->b_label) {
 			case '(CustomerInvoicePayment)':
-				$libelle = "Reglement" . ($obj->s_nom ? ': '.$obj->s_nom : '');
+				$who = trim($obj->s_nom);
+				// cut a bit the crap
+				$who = preg_replace(",\(.*\)$,Uims", "", $who);
+				$who = explode(' - ', $who)[0];
+				$who = explode(' / ', $who)[0];
+				$libelle = "Regl." . ($who ? ' ' . $who : '');
 				break;
 			case '(SupplierInvoicePayment)':
 				$libelle = "Paiement fournisseur" . ($obj->s_nom ? ': '.$obj->s_nom : '');
@@ -73,12 +89,34 @@ if ($result){
 				continue 2;
 				break;
 			default:
-				$libelle = $obj->b_label . ($obj->s_nom ? ' : '.$obj->s_nom : '');
+				$libelle = $obj->b_label;
+				if (strpos($libelle, 'fournisseur')) {
+					// on ignore les paiements fournisseurs, on veut juste exporter les reglements clients
+					continue 2;
+				}
+				$libelle = preg_replace(",Adh.+sion/Cotisation,Uims", "Adh.", $libelle);
+				if ($obj->a_nom) {
+					$libelle .= " " . $obj->a_nom;
+				} elseif ($obj->s_nom) {
+					$libelle .= " " . $obj->s_nom;
+				} elseif ($obj->sa_nom) {
+					$libelle .= " " . $obj->sa_nom;
+				}
 				break;
 		}
+
+		if ($c = $obj->s_code_compta or $c = $obj->sa_code_compta) {
+			$code_compta = $c;
+			$libelle .= " $code_compta";
+		}
+
 		if ($obj->b_num_chq) {
 			$piece = $obj->b_num_chq;
+			$libelle .= " [$piece]";
 		}
+
+		// DEBUG
+		//$libelle = $obj->b_rowid .". ".$libelle;
 
 		$debit = '';
 		$credit = '';
@@ -88,7 +126,7 @@ if ($result){
 		else {
 			$debit = str_replace(".",",", sprintf("%.2f", -$obj->b_amount));
 		}
-		$releves[$banque][] = [$date, $libelle, $debit, $credit, $piece];
+		$releves[$banque][] = [$date, $libelle, $debit, $credit, $code_compta, $piece];
 	}
 } else {
 	die("Erreur: rien a exporter pour la periode : $month_export");
@@ -114,11 +152,11 @@ if ($result){
 		}
 
 		if (isset($releves[$banque])) {
-			$csv = exporter_csv('', $releves[$banque], ',', $header);
+			$csv = exporter_csv('', $releves[$banque], ';', $header);
 			echo $csv;
 		}
 		else {
-			$csv = exporter_csv('', [], ',', $header);
+			$csv = exporter_csv('', [], ';', $header);
 			echo $csv;
 		}
 	}
