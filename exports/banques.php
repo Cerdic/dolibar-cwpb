@@ -94,7 +94,7 @@ if ($result){
 					// on ignore les paiements fournisseurs, on veut juste exporter les reglements clients
 					continue 2;
 				}
-				$libelle = preg_replace(",Adh.+sion/Cotisation,Uims", "Adh.", $libelle);
+				$libelle = preg_replace(",Adh.+sion/Cotisation,Uims", "Adhesion", $libelle);
 				if ($obj->a_nom) {
 					$libelle .= " " . $obj->a_nom;
 				} elseif ($obj->s_nom) {
@@ -105,7 +105,8 @@ if ($result){
 				break;
 		}
 
-		if ($c = $obj->s_code_compta or $c = $obj->sa_code_compta) {
+		// code_compta uniquement : pour les adhesion c'est une autre imputation, fixe (on ignore donc sa_code_compta)
+		if ($c = $obj->s_code_compta) {
 			$code_compta = $c;
 			$libelle .= " $code_compta";
 		}
