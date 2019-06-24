@@ -1,6 +1,6 @@
 SHELL=/bin/bash
 PATH=/opt/nursit/sys/admin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-#Si process critique alors le script doit être à la fin avec un MAILTO vers monitor
+#Si process critique alors le script doit Ãªtre Ã  la fin avec un MAILTO vers monitor
 MAILTO=b_info@nursit.net
 HOME=/opt/nursit/sys/admin
 
