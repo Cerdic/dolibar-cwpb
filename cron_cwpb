@@ -1,0 +1,8 @@
+SHELL=/bin/bash
+PATH=/opt/nursit/sys/admin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+#Si process critique alors le script doit être à la fin avec un MAILTO vers monitor
+MAILTO=b_info@nursit.net
+HOME=/opt/nursit/sys/admin
+
+# tous les 6 du mois a 9h00 le matin
+0 9 6 * * www-data  /usr/bin/php7.1 /home/sites_manuel/nursit.net/cwpbdoli/public_html/custom/cwpb/generer_exports.php >> /var/log/cwpbdoli.log

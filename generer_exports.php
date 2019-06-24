@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 
-$email_dest = "";
+$email_dest = "administratif@coworking-pb.com";
 
 $first_day_of_month = date('Y-m-01 00:00:00');
 
@@ -78,7 +78,7 @@ if ($email_dest) {
 
 		$mailer = new PHPMailer();
 		$mailer->From = 'noreply@coworking-pb.com';
-		$mailer->FromName = 'NoNo le petit robot';
+		$mailer->FromName = 'Nono le petit robot';
 		$mailer->CharSet = "utf-8";
 		$mailer->Mailer = 'mail';
 		$mailer->Subject = $sujet;
