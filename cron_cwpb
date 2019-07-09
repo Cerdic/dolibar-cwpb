@@ -5,4 +5,4 @@ MAILTO=b_info@nursit.net
 HOME=/opt/nursit/sys/admin
 
 # tous les 6 du mois a 9h00 le matin
-0 9 6 * * www-data  /usr/bin/php7.1 /home/sites_manuel/nursit.net/cwpbdoli/public_html/custom/cwpb/generer_exports.php >> /var/log/cwpbdoli.log
+0 9 6 * * root  /usr/bin/php7.1 /home/sites_manuel/nursit.net/cwpbdoli/public_html/custom/cwpb/generer_exports.php >> /var/log/cwpbdoli.log
