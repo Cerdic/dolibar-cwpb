@@ -1,6 +1,8 @@
 #!/usr/bin/php
 <?php
 
+$email_dest = "administratif@coworking-pb.com";
+
 if (isset($argv[1])) {
 	$t = strtotime($argv[1]);
 	if (!$t) {
@@ -126,6 +128,8 @@ if ($result){
 }
 
 
+$out = "";
+
 // et on refacture !
 $i = 0;
 $nb_success = 0;
@@ -134,40 +138,68 @@ $nb_ignore = 0;
 foreach ($refacturer as $ref=>$facture) {
 	$i++;
 	if (($deja_ref = cherche_deja_brouillon($facture['socid'])) !== false) {
-		echo "\t";
+		$out .= "\t";
 	}
-	echo "$i. SOCID:".$facture['socid']." - ".$facture['name']."    (d'apres $ref)\n";
+	$out .= "$i. SOCID:".$facture['socid']." - ".$facture['name']."    (d'apres $ref)\n";
 	foreach ($facture['lines'] as $line) {
-		echo "\t" . implode('|', $line) . "\n";
+		$out .= "\t" . implode('|', $line) . "\n";
 	}
 
 
 	if ($deja_ref !== false) {
-		echo "\tDEJA preparee en brouillon ce mois\n";
+		$out .= "\tDEJA preparee en brouillon ce mois\n";
 		$nb_ignore++;
 	}
 	else {
 
 		if ($res = doli_facture_inserer($facture['socid'], $facture['lines'])) {
-			echo "OK facture a valider " . $res['reference'] . "\n";
+			$out .= "OK facture a valider " . $res['reference'] . "\n";
 			$nb_success++;
 		}
 		else {
-			echo "ECHEC creation facture" . $res['reference'] . "\n";
+			$out .= "ECHEC creation facture" . $res['reference'] . "\n";
 			$nb_echec++;
 		}
 	}
-	echo "\n";
+	$out .= "\n";
 }
 
-echo "$nb_success factures générées";
+$out .= "$nb_success factures générées";
 if ($nb_echec) {
-	echo " / $nb_echec FAIL";
+	$out .= " / $nb_echec FAIL";
 }
 if ($nb_ignore) {
-	echo " / $nb_ignore IGNORE";
+	$out .= " / $nb_ignore IGNORE";
 }
-echo "\n";
+$out .= "\n";
+
+echo $out;
+
+if ($email_dest) {
+	require __DIR__ . '/inc/class.phpmailer.php';
+
+		$destinataire = $email_dest;
+		$sujet = "Factures mensuelles DOLIBAR";
+		$texte = $out;
+
+		$mailer = new PHPMailer();
+		$mailer->From = 'noreply@coworking-pb.com';
+		$mailer->FromName = 'Nono le petit robot';
+		$mailer->CharSet = "utf-8";
+		$mailer->Mailer = 'mail';
+		$mailer->Subject = $sujet;
+		$mailer->isHTML(false);
+		$mailer->Body = $texte;
+		foreach (explode(',', $destinataire) as $d) {
+			$mailer->addAddress(trim($d));
+		}
+
+		$mailer->createHeader();
+		$mailer->Send();
+		echo "Mail envoye a $destinataire\n";
+}
+
+
 
 function cherche_deja_brouillon($socid) {
 	global $db, $user;
