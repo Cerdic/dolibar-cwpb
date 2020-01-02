@@ -56,6 +56,12 @@ if ($result){
 		$exports[$file_export] = $titre_export;
 		echo "$titre_export -> $file_export\n";
 		passthru("php $dir/exports/banques.php $month_export $banque > $file_export");
+		if ($banque === 'STR') {
+			// ajouter les lignes de dons depuis le guichet
+			if (is_dir($d = '/home/sites/coworking-pb.com/guichet/public_html')) {
+				passthru("cd $d && spip exporter:banque --date=$month_export --withoutheaders >> $file_export");
+			}
+		}
 	}
 }
 
