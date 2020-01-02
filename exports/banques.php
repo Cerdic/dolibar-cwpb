@@ -95,6 +95,9 @@ if ($result){
 					continue 2;
 				}
 				$libelle = preg_replace(",Adh.+sion/Cotisation,Uims", "Adhesion", $libelle);
+				if (!$libelle){
+					$libelle = "Regl.";
+				}
 				if ($obj->a_nom) {
 					$libelle .= " " . $obj->a_nom;
 				} elseif ($obj->s_nom) {
