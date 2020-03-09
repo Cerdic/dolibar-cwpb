@@ -45,7 +45,11 @@ $exports[$file_export] = $titre_export;
 echo "$titre_export -> $file_export\n";
 passthru("php $dir/exports/ventes.php $month_export > $file_export");
 
-$sql = "SELECT ba.ref as ba_ref, ba.label as ba_label FROM lx_bank_account as ba WHERE ba.clos = 0 AND ba.entity IN (1) AND ba.ref !='CS' AND ba.ref !='LB' ORDER BY ba.rowid";
+$comptes_exclus = ['CS', 'LB', 'CSB'];
+$comptes_exclus = array_map('addslashes', $comptes_exclus);
+$in_not_exclus = "ba.ref NOT IN ('".implode("','", $comptes_exclus)."')";
+
+$sql = "SELECT ba.ref as ba_ref, ba.label as ba_label FROM lx_bank_account as ba WHERE ba.clos = 0 AND ba.entity IN (1) AND $in_not_exclus ORDER BY ba.rowid";
 $result = $db->query($sql);
 if ($result){
 	while ($obj = $db->fetch_object($result)){
