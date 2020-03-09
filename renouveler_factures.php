@@ -56,7 +56,7 @@ $date_end = $time_end;
 $p = explode(":", $conf->global->MAIN_INFO_SOCIETE_COUNTRY);
 $idpays = $p[0];
 
-$sql = "SELECT f.rowid, f.facnumber, f.type, f.datef, f.ref_client,";
+$sql = "SELECT f.rowid, f.ref, f.type, f.datef, f.ref_client,";
 $sql .= " fd.product_type, fd.description, fd.qty, fd.subprice, fd.total_ht, fd.total_tva, fd.tva_tx, fd.total_ttc, fd.localtax1_tx, fd.localtax2_tx, fd.total_localtax1, fd.total_localtax2, fd.rowid as id, fd.situation_percent,";
 $sql .= " s.rowid as socid, s.nom as name, s.code_compta, s.client,";
 $sql .= " p.rowid as pid, p.ref as pref,p.label as plabel, p.accountancy_code_sell,";
@@ -102,7 +102,7 @@ if ($result){
 
 			// pas les remboursements !
 			if ($obj->total_ht > 0) {
-				$ref_facture = $obj->facnumber;
+				$ref_facture = $obj->ref;
 				if (!isset($refacturer[$ref_facture])) {
 					$refacturer[$ref_facture] = [
 						'socid' => $obj->socid,
@@ -213,13 +213,13 @@ function cherche_deja_brouillon($socid) {
 		$last_rowid = $obj->rowid;
 	}
 
-	$sql = "SELECT f.rowid, f.facnumber"
+	$sql = "SELECT f.rowid, f.ref"
 	 . " FROM " . MAIN_DB_PREFIX . "facture as f"
 	 . " WHERE f.fk_soc = '" . addslashes($socid)."' AND f.fk_statut = 0 AND date_format(f.datec,'%Y%m') = '$month' AND f.rowid<=" . intval($last_rowid);
 
 	$result = $db->query($sql);
 	if ($result and $obj = $db->fetch_object($result)) {
-		return $obj->facnumber;
+		return $obj->ref;
 	}
 
 	return false;
