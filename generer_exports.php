@@ -1,6 +1,8 @@
 #!/usr/bin/php
 <?php
 
+#$email_dest = "cedric@yterium.com";
+#$email_dest = "cperron@prociam.fr,cedric@yterium.com";
 $email_dest = "administratif@coworking-pb.com";
 
 $first_day_of_month = date('Y-m-01 00:00:00');
@@ -61,9 +63,15 @@ if ($result){
 		echo "$titre_export -> $file_export\n";
 		passthru("php $dir/exports/banques.php $month_export $banque > $file_export");
 		if ($banque === 'STR') {
-			// ajouter les lignes de dons depuis le guichet
+			// ajouter les lignes de dons Stripe depuis le guichet
 			if (is_dir($d = '/home/sites/coworking-pb.com/guichet/public_html')) {
-				passthru("cd $d && spip exporter:banque --date=$month_export --withoutheaders >> $file_export");
+				passthru("cd $d && spip exporter:banque --date=$month_export --presta=stripe --withoutheaders >> $file_export");
+			}
+		}
+		if ($banque === 'STC') {
+			// ajouter les lignes de dons Stancer depuis le guichet
+			if (is_dir($d = '/home/sites/coworking-pb.com/guichet/public_html')) {
+				passthru("cd $d && spip exporter:banque --date=$month_export --presta=stancer --withoutheaders >> $file_export");
 			}
 		}
 	}
