@@ -35,9 +35,9 @@ $date_endyear = date('Y', $time_end);
  * Copyright (C) 2011-2014	Juanjo Menent		<jmenent@2byte.es>
  * Copyright (C) 2012		Regis Houssin		<regis.houssin@capnetworks.com>
  * Copyright (C) 2011-2012  Alexandre Spangaro	<aspangaro.dolibarr@gmail.com>
- * Copyright (C) 2012       Cédric Salvador     <csalvador@gpcsolutions.fr>
- * Copyright (C) 2013		Marcos García		<marcosgdf@gmail.com>
- * Copyright (C) 2014       Raphaël Doursenaud  <rdoursenaud@gpcsolutions.fr>
+ * Copyright (C) 2012       CÃ©dric Salvador     <csalvador@gpcsolutions.fr>
+ * Copyright (C) 2013		Marcos Garcia		<marcosgdf@gmail.com>
+ * Copyright (C) 2014       RaphaÃ«l Doursenaud  <rdoursenaud@gpcsolutions.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -139,7 +139,14 @@ if ($result){
 		$obj = $db->fetch_object($result);
 		// les variables
 		$cptcli = (!empty($conf->global->ACCOUNTING_ACCOUNT_CUSTOMER) ? $conf->global->ACCOUNTING_ACCOUNT_CUSTOMER : $langs->trans("CodeNotDef"));
-		$compta_soc = (!empty($obj->code_compta) ? $obj->code_compta : $cptcli);
+		if (empty($obj->code_compta)) {
+			$compta_soc = $cptcli; // code client par dÃ©faut
+			if ($obj->product_type!==0) {
+				$compta_soc = '411CU19080360'; // CHAPELET de passage
+			}
+		} else {
+			$compta_soc = $obj->code_compta;
+		}
 		$compta_prod = $obj->accountancy_code_sell;
 		if (empty($compta_prod)){
 			if ($obj->product_type==0){
