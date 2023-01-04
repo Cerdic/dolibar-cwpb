@@ -72,13 +72,14 @@ if ($result){
 			// ajouter les lignes de dons Stancer depuis le guichet
 			if (is_dir($d = '/home/sites/coworking-pb.com/guichet/public_html')) {
 				passthru("cd $d && spip exporter:banque --date=$month_export --presta=stancer --withoutheaders >> $file_export");
+				
+				// Ajouter un export pour stancer, mais je sais pas trop encore a quoi il va servir...
+				$file_export_stc = "$dir_export/$month_export-paiements-stancer.csv";
+				$titre_export_stc = "Paiements et frais Stancer $month_export";
+				$exports[$file_export_stc] = $titre_export_stc;
+				passthru("cd $d && spip bank:stancer:report > $file_export_stc");
 			}
 
-			// Ajouter un export pour stancer, mais je sais pas trop encore a quoi il va servir...
-			$file_export_stc = "$dir_export/$month_export-paiements-stancer.csv";
-			$titre_export_stc = "Paiements et frais Stancer $month_export";
-			$exports[$file_export_stc] = $titre_export_stc;
-			passthru("cd $d && spip bank:stancer:report > $file_export_stc");
 		}
 	}
 }
