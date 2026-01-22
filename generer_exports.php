@@ -68,6 +68,12 @@ if ($result){
 				passthru("cd $d && spip exporter:banque --date=$month_export --presta=stripe --withoutheaders >> $file_export");
 			}
 		}
+		if ($banque === 'MOL') {
+			// ajouter les lignes de dons Mollie depuis le guichet
+			if (is_dir($d = '/home/sites/coworking-pb.com/guichet/public_html')) {
+				passthru("cd $d && spip exporter:banque --date=$month_export --presta=mollie --withoutheaders >> $file_export");
+			}
+		}
 		if ($banque === 'STC') {
 			// ajouter les lignes de dons Stancer depuis le guichet
 			if (is_dir($d = '/home/sites/coworking-pb.com/guichet/public_html')) {
